@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH -p RM-shared
+#SBATCH -t 47:00:00
+#SBATCH --ntasks-per-node=64
+#SBTACH -A bio220045p
+
+date
+mkdir ./result/featureCounts
+
+#/ocean/projects/tra110037p/lgao3/software/subread-2.0.3-source/bin/subread-align -T 32 -i /ocean/projects/tra110037p/lgao3/IndexAnnotationfiles/RsubreadBuildIndex/GRCm38.p6.index_20220222 -r ${1}_1_paired.fq.gz -R ${1}_2_paired.fq.gz -t 0 -o ../result/subread_alignment/${1}.bam
+
+/ocean/projects/tra110037p/lgao3/software/subread-2.0.3-source/bin/featureCounts -p --countReadPairs -T 64 -a /ocean/projects/tra110037p/lgao3/software/subread-2.0.3-source/annotation/mm10_RefSeq_exon.txt -F 'SAF'  -o ./result/featureCounts/20220925_featureCounts_onTrimmed.csv ./result/subread_alignment/*.bam 
+
+echo "Completed"
+date

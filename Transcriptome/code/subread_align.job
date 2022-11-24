@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH -p RM-shared
+#SBATCH -t 5:00:00
+#SBATCH --ntasks-per-node=32
+#SBTACH -A tra110037p
+
+cd ./data
+
+date
+echo $1
+
+/ocean/projects/tra110037p/lgao3/software/subread-2.0.3-source/bin/subread-align -T 32 -i /ocean/projects/tra110037p/lgao3/IndexAnnotationfiles/RsubreadBuildIndex/GRCm38.p6.index_20220222 -r ${1}_1_paired.fq.gz -R ${1}_2_paired.fq.gz -t 0 -o ../result/subread_alignment/${1}.bam
+
+echo "Completed"
+date

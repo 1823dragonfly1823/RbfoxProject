@@ -1,0 +1,13 @@
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH -p GPU-shared
+#SBATCH -t 10:00:00
+#SBATCH --gpus=v100-32:4
+#SBTACH -A tra110037p
+
+cd /ocean/projects/bio220045p/lgao3/
+
+/ocean/projects/tra110037p/lgao3/software/FastQC/fastqc ./data/${1}_paired.fq.gz --outdir=./result/fastqc_result_trimmed_4:20
+
+echo "Completed"
+date
