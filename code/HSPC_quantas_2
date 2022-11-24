@@ -1,0 +1,31 @@
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH -p RM-shared
+#SBATCH -t 48:00:00
+#SBATCH --ntasks-per-node=32
+
+cd /ocean/projects/tra110037p/lgao3/result/GSE81682/FastqFiles/HSPC
+
+files=(`ls ./ | grep fastq.gz `)
+for i in {400..695}
+do
+	echo ${files[i]}
+	echo ${files[i+696]}
+	b=`basename "${files[i]}"  _Mus_musculus_RNA-Seq.fastq.gz`
+	echo $b
+	#searchstring="Long-term_Haematopoietic_stem_cell_"
+	#catname=${b%*$searchstring}
+	catname=${b##*Haematopoietic_stem_cell_multipotent_progenitor_}
+	echo $catname
+	cat "./${files[i]}" "./${files[i+696]}" > "./${catname}.fastq.gz"
+
+/ocean/projects/tra110037p/lgao3/olego/olego -v -t 32 -r /ocean/projects/tra110037p/lgao3/olego/models/mm.cfg -j /ocean/projects/tra110037p/lgao3/IndexAnnotationfiles/mm10.intron.hmr.bed -o "./${catname}.sam"  /ocean/projects/tra110037p/lgao3/IndexAnnotationfiles/GRCm38.primary_assembly.genome.fa.gz "./${catname}.fastq.gz"
+
+perl /ocean/projects/tra110037p/lgao3/olego/sam2bed.pl --uniq -v "./${catname}.sam" "./${catname}.unique.bed"
+
+perl /ocean/projects/tra110037p/lgao3/Quantas/quantas-master/countit/summarize_splicing_wrapper.pl -c ./"${catname}.cache" -v -big -conf /ocean/projects/tra110037p/lgao3/IndexAnnotationfiles/mm10.conf -dbkey mm10 -cass -taca -alt5 -alt3 -mutx -iret "./${catname}.unique.bed" "./${catname}_countit_out"
+
+rm  ${files[i]} ${files[i+696]}
+rm  "${catname}.fastq.gz"
+rm "./${catname}.sam" "./${catname}.unique.bed"
+done
